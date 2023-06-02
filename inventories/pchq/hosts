@@ -1,0 +1,19 @@
+[etcd]
+postgres[01:03].penholder.xyz
+
+[etcd_master]
+postgres[01:03].penholder.xyz
+
+[postgresql]
+postgres[01:03].penholder.xyz
+
+[gather:children]
+postgresql
+
+# add tls_bastion as localhost
+[tls_bastion]
+localhost ansible_connection=local
+
+# you MUST define an inventory group that matches the name of the postgresql cluster (postgresql_cluster_name)
+[pchq_perthchat:children]
+etcd_master

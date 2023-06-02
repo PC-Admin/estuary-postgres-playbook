@@ -1,0 +1,47 @@
+---
+# Vars needed for EBI postgres
+
+internal_subnet: "10.1.1.0/16"
+
+postgresql_cluster_name: pchq_perthchat
+
+patroni_postgresql_version: 15
+
+patroni_system_group: postgres
+patroni_install_haproxy: false
+patroni_install_watchdog_loader: false
+patroni_etcd_hosts: "{% for host in groups[postgresql_cluster_name] %}{{ hostvars[host]['inventory_hostname'] }}:2379{% if not loop.last %},{% endif %}{% endfor %}"  # yamllint disable-line rule:line-length
+patroni_etcd_protocol: https
+patroni_etcd_cacert: "/var/lib/patroni.pki/ca.pem"
+patroni_etcd_cert: "/var/lib/patroni.pki/{{ inventory_hostname }}.pem"
+patroni_etcd_key: "/var/lib/patroni.pki/{{ inventory_hostname }}-key.pem"
+patroni_postgresql_connect_address: "{{ ansible_ens18.ipv4.address }}:5432"
+patroni_restapi_connect_address: "{{ ansible_ens18.ipv4.address }}:{{ patroni_restapi_port }}"
+
+patroni_postgresql_pg_hba:
+  - { type: "local", database: "all", user: "all", method: "peer" }
+  #- { type: "host", database: "all", user: "postgres", address: "{{ internal_subnet }}", method: "scram-sha-256" }
+  - { type: "host", database: "replication", user: "{{ patroni_replication_username }}", address: "{{ internal_subnet }}", method: "scram-sha-256" } # Allow Patroni replication
+  - { type: "host", database: "replication", user: "{{ patroni_replication_username }}", address: "127.0.0.1/32", method: "scram-sha-256" } # Allow local Patroni access
+
+# Do need these if you want to define postgres users - don't need if you are migrating from an existing PostgreSQL cluster.
+# # Postgresql variables
+# postgresql_users:
+#   - name: "matrix"
+#     password: aAfjnOEeu6TpDhOgqMOT
+
+# Do need this
+# Password used internally for replication.
+
+
+# DON'T NEED THESE:
+# etcd_user: etcd
+
+# Don't need this, don't set it please
+# # Global settings for all PostgreSQL clusters.
+# patroni_scope: "{{ postgresql_cluster_name }}"
+
+# Don't set this twice
+# # Subnet for main EHI network
+# internal_subnet: "10.24.0.0/16"
+
