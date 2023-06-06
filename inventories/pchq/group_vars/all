@@ -23,6 +23,9 @@ patroni_postgresql_pg_hba:
   #- { type: "host", database: "all", user: "postgres", address: "{{ internal_subnet }}", method: "scram-sha-256" }
   - { type: "host", database: "replication", user: "{{ patroni_replication_username }}", address: "{{ internal_subnet }}", method: "scram-sha-256" } # Allow Patroni replication
   - { type: "host", database: "replication", user: "{{ patroni_replication_username }}", address: "127.0.0.1/32", method: "scram-sha-256" } # Allow local Patroni access
+  - { type: "host", database: "all", user: "all", address: "10.1.1.11/32", method: "scram-sha-256" } # prod-haproxy01.pchq.tech
+  - { type: "host", database: "all", user: "all", address: "10.1.1.12/32", method: "scram-sha-256" } # prod-haproxy02.pchq.tech
+  - { type: "host", database: "all", user: "all", address: "10.1.1.13/32", method: "scram-sha-256" } # prod-haproxy03.pchq.tech
 
 # Do need these if you want to define postgres users - don't need if you are migrating from an existing PostgreSQL cluster.
 # # Postgresql variables
